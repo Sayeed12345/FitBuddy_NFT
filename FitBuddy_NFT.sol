@@ -369,15 +369,16 @@ contract NarratorsHut is INarratorsHut, ERC721Hut, IERC2981, Ownable {
     string private baseURI;
 
     bool public isSaleActive = false;
-    
-    mapping(bytes32 => uint256) private _tokenIdsByMintKey;
+
+    bool private isOpenSeaConduitActive = true;    
 
     address public metadataContractAddress;
-    address public narratorAddress;
 
-    bool private isOpenSeaConduitActive = true;
+    address public narratorAddress;
    
     bytes32 private immutable domainSeparator;
+
+    mapping(bytes32 => uint256) private _tokenIdsByMintKey;
 
     constructor(address _metadataContractAddress, address _narratorAddress, string memory _baseURI) ERC721Hut("The Narrator's Hut", "HUT") {
         domainSeparator = keccak256(abi.encode(Signatures.DOMAIN_TYPEHASH,keccak256(bytes("MintToken")),keccak256(bytes("1")),block.chainid,address(this)));
@@ -547,6 +548,7 @@ contract NarratorsHut is INarratorsHut, ERC721Hut, IERC2981, Ownable {
     error InvalidMintSignature();
     error PaymentBalanceZero();
     error PaymentUnsuccessful(bytes result);
+
 }
 
 
@@ -826,7 +828,9 @@ library Signatures {
     bytes32 constant DOMAIN_TYPEHASH = keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
 
     bytes constant TOKEN_DATA_TYPE_DEF = "TokenData(uint32 artifactId,uint32 witchId)";
+    
     bytes32 constant MINT_TYPEHASH = keccak256(abi.encodePacked("Mint(address minterAddress,uint256 totalCost,uint256 expiresAt,TokenData[] tokenDataArray)",TOKEN_DATA_TYPE_DEF));
+
     bytes32 constant TOKEN_DATA_TYPEHASH = keccak256(TOKEN_DATA_TYPE_DEF);
    
     function recreateMintHash(bytes32 domainSeparator, address minterAddress, uint256 totalCost, uint256 expiresAt, TokenData[] calldata tokenDataArray) internal pure returns(bytes32) {
@@ -947,6 +951,10 @@ library Address {
 // File: contracts\open-zeppelin-contracts\IERC20.sol
 
 interface IERC20 {
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    
+    event Approval(address indexed owner, address indexed spender, uint256 value);
    
     function totalSupply() external view returns(uint256);
    
@@ -960,10 +968,6 @@ interface IERC20 {
    
     function transferFrom(address sender, address recipient, uint256 amount) external returns(bool);
     
-    event Transfer(address indexed from, address indexed to, uint256 value);
-    
-    event Approval(address indexed owner, address indexed spender, uint256 value);
-
 }
 
 
