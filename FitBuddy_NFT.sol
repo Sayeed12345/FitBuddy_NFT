@@ -531,8 +531,7 @@ contract NarratorsHut is INarratorsHut, ERC721Hut, IERC2981, Ownable {
         return url;
     }
     
-    function royaltyInfo(uint256 tokenId, uint256 salePrice) external view override
-    returns(address receiver, uint256 royaltyAmount) {
+    function royaltyInfo(uint256 tokenId, uint256 salePrice) external view override returns(address receiver, uint256 royaltyAmount) {
         if (!_exists(tokenId)) revert RoyaltiesQueryForNonexistentToken();
         return (owner(), (salePrice * 5) / 100);
     }
